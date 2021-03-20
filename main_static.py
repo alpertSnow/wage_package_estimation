@@ -468,6 +468,7 @@ class Compete(Unit):
 
     # 各家单位先扣减40%，然后自己套国资委的递延计算方法，得出工资总额+递延+扣减的总数（后面还需统一微调，即tune()）
     def rate_3_cal(self):
+        """目前是先扣减，再递延，但是国资委公式里算出来的是递延+扣减，所以好像应该先算（递延+扣减）然后再扣40%"""
         # 与Units.rate_3_cal()差别仅在与是否扣减40%
         self.deduct_rate_3 = 0.0 if self.rate_2 <= 0 or self.subcategory == "approved" else self.rate_2 * 0.4
         self.deduct_3 = self.package_last_year * self.deduct_rate_3
@@ -476,7 +477,7 @@ class Compete(Unit):
             self.rate_3 = GZW_RATE_CAP
             # 套用国资委递延计算函数
             self.defer_3 = ((1 + self.rate_1) - (1 + self.rate_3)) / \
-                           ((1 / self.package_last_year) + 0.5 * 1 / self.total_profit_last_year)
+                           ((1 / self.package_last_year) + 0.5 * 1 / self.total_profit_last_year) - self.deduct_3
         else:
             self.rate_3 = self.rate_2 - self.deduct_rate_3
             self.defer_3 = 0.0
@@ -533,7 +534,8 @@ class Public(Unit):
         self.cost_index = cost_index
         self.operate_index = operate_index
         self.quality_index_growth = (quality_index - quality_index_last_year) / abs(quality_index_last_year)
-        self.cost_index_growth = (cost_index - cost_index_last_year) / abs(cost_index_last_year)
+        # cost/revenue加负号
+        self.cost_index_growth = - ((cost_index - cost_index_last_year) / abs(cost_index_last_year))
         self.operate_index_growth = (operate_index - operate_index_last_year) / abs(operate_index_last_year)
 
     def rate_1_cal(self):
