@@ -57,8 +57,6 @@ def create_approved_obj(section_units_df):
                                eff_index_1_name="人均利润", eff_index_2_name="人均营收",
                                eff_index_1_weight=0.5, eff_index_2_weight=0.5)
         # 由于没有写人工成本投入产出率联动指标的逻辑，所以如果国资委批复不触发70%条款，就得修改程序
-        if approved_obj.avg_wage_last_year <= 3 * AVG_TOWN_WAGE:
-            print("Warning: %s去年平均工资<3*AVG_TOWN_WAGE，人工成本投入产出率指标可能生效" % section_units_df.category[0])
     elif section_units_df.category[0] == "Public":
         """公共服务类板块总额中不进行关联交易剔除"""
         approved_obj = Public(var_name="public_approved", name="公共服务性板块国资委批复",
@@ -85,8 +83,6 @@ def create_approved_obj(section_units_df):
                               quality_index=section_units_df.quality_index.sum(),
                               cost_index=section_units_df.cost_index.sum(),
                               operate_index=section_units_df.operate_index.sum())
-        if approved_obj.avg_wage_last_year <= 2.5 * AVG_TOWN_WAGE:
-            print("Warning: %s去年平均工资<2.5*AVG_TOWN_WAGE，人工成本投入产出率指标可能生效" % section_units_df.category[0])
     elif section_units_df.category[0] == "Special":
         """【特殊功能板块进行关联交易剔除！！！】"""
         approved_obj = Special(var_name="special_approved", name="特殊功能性板块国资委批复",
@@ -115,8 +111,6 @@ def create_approved_obj(section_units_df):
                                avg_employee=section_units_df.avg_employee.sum(),
                                eff_index_1_name="人均利润", eff_index_2_name="人均营收",
                                eff_index_1_weight=0.5, eff_index_2_weight=0.5)  # eff_indexes未确定，如果未触及70%条款则需修改
-        if approved_obj.avg_wage_last_year <= 3 * AVG_TOWN_WAGE:
-            print("Warning: %s去年平均工资<3*AVG_TOWN_WAGE，人工成本投入产出率指标可能生效" % section_units_df.name[0])
     else:
         raise ValueError("%s: category error" % section_units_df.category[0])
     approved_obj.subcategory = "approved"
@@ -385,9 +379,15 @@ class Unit(object):
         if self.rate_1 >= 0:
             if self.eff_growth < 0 or self.avg_wage_last_year > AVG_TOWN_WAGE * avg_town_wage_limit:
                 self.rate_2 = 0.7 * self.rate_1
+            elif self.subcategory == "approved":
+                print("Warning: %s效益提升，去年平均工资<%s*AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
+                      (self.var_name, avg_town_wage_limit))
         elif self.rate_1 < 0:
             if self.eff_growth > 0 or self.avg_wage_last_year <= AVG_TOWN_WAGE:
                 self.rate_2 = 0.4 * self.rate_1
+            elif self.subcategory == "approved":
+                print("Warning: %s效益下降，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标下降，人工成本投入产出率指标(未计算)可能生效" %
+                      self.var_name)
         self.package_2 = self.package_last_year * (1 + self.rate_2)
 
     """第三步：水平调控"""
