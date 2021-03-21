@@ -1,7 +1,9 @@
 from ConstVar import GZW_BASE_RATE
 from ConstVar import GZW_RATE_CAP
 from ConstVar import TOLERANCE
+from scipy.stats import truncnorm
 import pandas as pd
+import numpy as np
 
 """function"""
 
@@ -11,6 +13,31 @@ def key_score_convert(key_score):
     """线性折算"""
     key_score_converted_growth = (key_score - 80) / 20 * GZW_BASE_RATE
     return key_score_converted_growth
+
+
+# 根据输入的参数，生成一个随机的列表
+def randomize_inputs(inputs_mean_df, inputs_sd_df, inputs_lower_df, inputs_upper_df):
+    def f(mean, sd, lower, upper):
+        if type(mean) == int or type(mean) == float:
+            if not np.isnan(sd) and sd > 0:
+                mean = float(mean)
+                a = np.nanmax([(lower - mean) / sd, -np.inf])
+                b = np.nanmin([(upper - mean) / sd, np.inf])
+                try:
+                    return truncnorm.rvs(a=a, b=b, loc=mean, scale=sd, size=1)[0]
+                except Exception as inst:
+                    print(type(inst))  # the exception instance
+                    print(inst)  # __str__ allows args to be printed directly,
+                    print("mean=%.2f, sd=%.2f, lower=%.2f, upper=%.2f" % (mean, sd, lower, upper))
+                    quit("Error in running truncnorm()! Please check your inputs files!")
+            else:
+                return mean
+        else:
+            return mean
+    vec_f = np.vectorize(f)
+    inputs_randomized = pd.DataFrame(vec_f(inputs_mean_df, inputs_sd_df, inputs_lower_df, inputs_upper_df))
+    inputs_randomized.columns = inputs_mean_df.columns
+    return inputs_randomized
 
 
 # 创建板块批复对象
