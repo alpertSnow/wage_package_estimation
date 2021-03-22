@@ -2,6 +2,7 @@ from ConstVar import GZW_BASE_RATE
 from ConstVar import GZW_RATE_CAP
 from ConstVar import TOLERANCE
 from scipy.stats import truncnorm
+from tqdm import tqdm
 import pandas as pd
 import numpy as np
 
@@ -152,7 +153,7 @@ def tune(section_units_df, section_total_package_3, approved_package, approved_d
     # 检查错误
     if df.total_package_final.sum() > approved_package + approved_defer + TOLERANCE or \
             df.package_final.sum() > approved_package + TOLERANCE:
-        print(df)
+        tqdm.write(df)
         raise ValueError('%s call tune(): 微调平账时出错！' % section_units_df.name[0])
     return df
 

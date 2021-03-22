@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pandas as pd
+from tqdm import tqdm  # 进度条
 from ClassDef import Compete  # 竞争类板块对象
 from ClassDef import Public  # 公共服务类板块对象
 from ClassDef import SpecialGov  # 特殊功能类类板块对象（政府型）
@@ -28,6 +29,7 @@ if __name__ == '__main__':
 
     # 开始循环
     all_results_df = pd.DataFrame()
+    progress_bar = tqdm(total=SAMPLE_SIZE)
     for k in range(SAMPLE_SIZE):
         inputs = randomize_inputs(df1, df2, df3, df4)
         # 构造各单位实例
@@ -142,7 +144,8 @@ if __name__ == '__main__':
         # 最后几个数值的计算
         results_df = rate_final_cal(results_df)
         all_results_df = all_results_df.append(results_df)
-
+        # update progress bar
+        progress_bar.update(1)
     """输出csv"""
     all_results_df.to_csv("results.csv", encoding="UTF-8", float_format='%.5f')
     all_results_df.to_excel("results.xlsx", sheet_name="all", encoding="UTF-8", engine='xlsxwriter', float_format='%.5f')

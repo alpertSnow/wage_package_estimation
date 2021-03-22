@@ -1,5 +1,6 @@
 import numpy as np
 import FnDef as fd
+from tqdm import tqdm
 from ConstVar import AVG_TOWN_WAGE
 from ConstVar import GZW_RATE_CAP
 from ConstVar import LOAD_INDEX_LIMITS
@@ -134,32 +135,32 @@ class Unit(object):
             # 人工成本投入产出指标应计算的报警
             elif self.category == "Compete" and self.subcategory == "approved" and warned[0] == 0:
                 warned[0] = 1
-                print("Warning: %s效益提升，去年平均工资<%s*AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
-                      (self.var_name, avg_town_wage_limit))
+                tqdm.write("Warning: %s效益提升，去年平均工资<%s*AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
+                           (self.var_name, avg_town_wage_limit))
             elif self.category == "Public" and self.subcategory == "approved" and warned[1] == 0:
                 warned[1] = 1
-                print("Warning: %s效益提升，去年平均工资<%s*AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
-                      (self.var_name, avg_town_wage_limit))
+                tqdm.write("Warning: %s效益提升，去年平均工资<%s*AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
+                           (self.var_name, avg_town_wage_limit))
             elif self.category == "Special" and self.subcategory == "approved" and warned[2] == 0:
                 warned[2] = 1
-                print("Warning: %s效益提升，去年平均工资<%s*AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
-                      (self.var_name, avg_town_wage_limit))
+                tqdm.write("Warning: %s效益提升，去年平均工资<%s*AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
+                           (self.var_name, avg_town_wage_limit))
         elif self.rate_1 < 0:
             if self.eff_growth > 0 or self.avg_wage_last_year <= AVG_TOWN_WAGE:
                 self.rate_2 = 0.4 * self.rate_1
             # 人工成本投入产出指标应计算的报警
             elif self.category == "Compete" and self.subcategory == "approved" and warned[0] == 0:
                 warned[0] = 1
-                print("Warning: %s效益下降，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标下降，人工成本投入产出率指标(未计算)可能生效" %
-                      self.var_name)
+                tqdm.write("Warning: %s效益下降，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标下降，人工成本投入产出率指标(未计算)可能生效" %
+                           self.var_name)
             elif self.category == "Public" and self.subcategory == "approved" and warned[1] == 0:
                 warned[1] = 1
-                print("Warning: %s效益下降，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标下降，人工成本投入产出率指标(未计算)可能生效" %
-                      self.var_name)
+                tqdm.write("Warning: %s效益下降，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标下降，人工成本投入产出率指标(未计算)可能生效" %
+                           self.var_name)
             elif self.category == "Special" and self.subcategory == "approved" and warned[2] == 0:
                 warned[2] = 1
-                print("Warning: %s效益下降，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标下降，人工成本投入产出率指标(未计算)可能生效" %
-                      self.var_name)
+                tqdm.write("Warning: %s效益下降，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标下降，人工成本投入产出率指标(未计算)可能生效" %
+                           self.var_name)
         self.package_2 = self.package_last_year * (1 + self.rate_2)
 
     """第三步：水平调控"""
@@ -179,9 +180,10 @@ class Unit(object):
         self.package_3 = (1 + self.rate_3) * self.package_last_year
         self.total_package_3 = np.nansum(self.package_3 + self.defer_3 + self.deduct_3)
         if self.defer_3 != 0.0:
-            raise Warning("%s 有递延" % self.name)
+            tqdm.write("Warning: %s 有递延" % self.name)
 
     """第四步：如果是国资委批复，则最终批复 = 第三步计算结果"""
+
     def copy_3_as_final(self):
         if self.subcategory == "approved":
             self.rate_final = self.rate_3
