@@ -11,7 +11,7 @@ LOAD_INDEX_LIMITS = LOAD_INDEX_LIMITS_MULTIPLIER * GZW_BASE_RATE
 FINANCIAL_INDEX_LIMITS_MULTIPLIER = pd.Series([-3, 3])  # 经济效益指标区间乘数
 FINANCIAL_INDEX_LIMITS = FINANCIAL_INDEX_LIMITS_MULTIPLIER * GZW_BASE_RATE
 TOLERANCE = 1E-8  # 比较时使用，去除计算误差
-SAMPLE_SIZE = 10  # 随机采样个数
+SAMPLE_SIZE = 1000  # 随机采样个数
 
 """var"""
 GZW_score_converted_growth = 0.03  # 国资委考核京投重大任务完成率转换的增幅
