@@ -37,6 +37,7 @@ def randomize_inputs(inputs_mean_df, inputs_sd_df, inputs_lower_df, inputs_upper
     vec_f = np.vectorize(f)
     inputs_randomized = pd.DataFrame(vec_f(inputs_mean_df, inputs_sd_df, inputs_lower_df, inputs_upper_df))
     inputs_randomized.columns = inputs_mean_df.columns
+    inputs_randomized = inputs_randomized.astype(inputs_mean_df.dtypes.to_dict())
     return inputs_randomized
 
 

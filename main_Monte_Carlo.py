@@ -6,6 +6,7 @@ from ClassDef import Compete  # 竞争类板块对象
 from ClassDef import Public  # 公共服务类板块对象
 from ClassDef import SpecialGov  # 特殊功能类类板块对象（政府型）
 from ClassDef import SpecialMarket  # 特殊功能类类板块对象（经营型）
+from FnDef import randomize_inputs  # 根据输入的参数，生成一个随机的列表
 from FnDef import create_approved_obj  # 创建板块批复对象
 from FnDef import tune  # 平账微调
 from FnDef import create_section_obj  # 创建板块合计对象
@@ -18,7 +19,13 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 """main"""
 if __name__ == '__main__':
-    inputs = pd.read_csv('inputs.csv', converters={'subcategory': str})
+    # 读取输入条件，四个表格分别为：平均值、标准差、下界、上界。非数值则只采用inputs_mean中的值
+    df1 = pd.read_csv('inputs_mean.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+    df2 = pd.read_csv('inputs_sd.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+    df3 = pd.read_csv('inputs_lower.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+    df4 = pd.read_csv('inputs_upper.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+
+    inputs = randomize_inputs(df1, df2, df3, df4)
     # 构造各单位实例
     for i, data in inputs.iterrows():
         class_name = data['category'] + data['subcategory']
