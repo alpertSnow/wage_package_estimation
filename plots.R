@@ -1,0 +1,10 @@
+library(ggplot2)
+library(data.table)
+library(dplyr)
+db <- fread("results.csv", encoding = "UTF-8") %>% group_by(var_name)
+results_names <- fread("results_chs_index.csv", encoding = "UTF-8", header = FALSE)
+# su <- summarise(db, max = max(package_final), min = min(package_final))
+units_names <- unique(db$name)
+col_names <- colnames(select_if(db, is.numeric))
+i <- "本年度平均工资（万元"
+var_to_show <- results_names %>% filter(V2 == i) %>% pull(1)
