@@ -242,7 +242,7 @@ class Compete(Unit):
 
     # 各家单位先扣减40%，然后自己套国资委的递延计算方法，得出工资总额+递延+扣减的总数（后面还需统一微调，即tune()）
     def rate_3_cal(self):
-        """目前是先扣减，再递延，但是国资委公式里算出来的是递延+扣减，所以好像应该先算（递延+扣减）然后再扣40%"""
+        # TODO: 目前是先扣减，再递延，但是国资委公式里算出来的是递延+扣减，所以好像应该先算（递延+扣减）然后再扣40%
         # 与Units.rate_3_cal()差别仅在与是否扣减40%
         self.deduct_rate_3 = 0.0 if self.rate_2 <= 0 or self.subcategory == "approved" else self.rate_2 * 0.4
         self.deduct_3 = self.package_last_year * self.deduct_rate_3
@@ -429,6 +429,7 @@ class SpecialGov(Special):
         self.load_index_limited = np.nan
 
     def rate_1_cal(self):
+        # TODO: just use key_score
         if self.load_index_growth < LOAD_INDEX_LIMITS[0]:
             self.load_index_limited = -1
             self.rate_1 = 0.5 * self.key_score_converted_growth + 0.5 * LOAD_INDEX_LIMITS[0]

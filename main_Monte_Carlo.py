@@ -27,6 +27,7 @@ if __name__ == '__main__':
     df3 = pd.read_csv('inputs_lower.csv', converters={'subcategory': str}).astype("float", errors='ignore')
     df4 = pd.read_csv('inputs_upper.csv', converters={'subcategory': str}).astype("float", errors='ignore')
 
+    # TODO: multiprocessing
     # 开始循环
     all_results_df = pd.DataFrame()
     progress_bar = tqdm(total=SAMPLE_SIZE)
@@ -147,5 +148,6 @@ if __name__ == '__main__':
         # update progress bar
         progress_bar.update(1)
     """输出csv"""
-    all_results_df.to_csv("results.csv", encoding="UTF-8", float_format='%.5f')
-# all_results_df.to_excel("results.xlsx", sheet_name="all", encoding="UTF-8", engine='xlsxwriter', float_format='%.5f')
+    all_results_df.to_csv("results.csv", encoding="UTF-8", float_format='%.5f', index=False)
+# all_results_df.to_excel("results.xlsx", sheet_name="all", encoding="UTF-8", engine='xlsxwriter', float_format='%.5f'
+# , index=False)
