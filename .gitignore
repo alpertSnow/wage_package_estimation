@@ -2,3 +2,5 @@
 /.idea/
 /database/
 .Rproj.user
+.Rhistory
+__pycache__/
