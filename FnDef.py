@@ -66,8 +66,14 @@ def create_approved_obj(section_units_df):
                                other_income=section_units_df.other_income.sum(),
                                avg_employee_last_year=section_units_df.avg_employee_last_year.sum(),
                                avg_employee=section_units_df.avg_employee.sum(),
-                               eff_index_1_name="人均利润", eff_index_2_name="人均营收",
-                               eff_index_1_weight=0.5, eff_index_2_weight=0.5)
+                               eff_index_1_name=section_units_df.eff_index_1_name[0],
+                               eff_index_2_name=section_units_df.eff_index_2_name[0],
+                               eff_index_3_name=section_units_df.eff_index_3_name[0],
+                               eff_index_4_name=section_units_df.eff_index_4_name[0],
+                               eff_index_1_weight=section_units_df.eff_index_1_weight[0],
+                               eff_index_2_weight=section_units_df.eff_index_2_weight[0],
+                               eff_index_3_weight=section_units_df.eff_index_3_weight[0],
+                               eff_index_4_weight=section_units_df.eff_index_4_weight[0])
         # 由于没有写人工成本投入产出率联动指标的逻辑，所以如果国资委批复不触发70%条款，就得修改程序
     elif section_units_df.category[0] == "Public":
         """公共服务类板块总额中不进行关联交易剔除"""
@@ -87,8 +93,14 @@ def create_approved_obj(section_units_df):
                               other_income=section_units_df.other_income.sum(),
                               avg_employee_last_year=section_units_df.avg_employee_last_year.sum(),
                               avg_employee=section_units_df.avg_employee.sum(),
-                              eff_index_1_name="人均利润", eff_index_2_name="人均营收",
-                              eff_index_1_weight=0.5, eff_index_2_weight=0.5,  # eff_indexes未确定，如果未触及70%条款则需修改
+                              eff_index_1_name=section_units_df.eff_index_1_name[0],
+                              eff_index_2_name=section_units_df.eff_index_2_name[0],
+                              eff_index_3_name=section_units_df.eff_index_3_name[0],
+                              eff_index_4_name=section_units_df.eff_index_4_name[0],
+                              eff_index_1_weight=section_units_df.eff_index_1_weight[0],
+                              eff_index_2_weight=section_units_df.eff_index_2_weight[0],
+                              eff_index_3_weight=section_units_df.eff_index_3_weight[0],
+                              eff_index_4_weight=section_units_df.eff_index_4_weight[0],  # eff_indexes未确定，如果未触及70%条款则需修改
                               quality_index_last_year=section_units_df.quality_index_last_year.sum(),
                               cost_index_last_year=section_units_df.cost_index_last_year.sum(),
                               operate_index_last_year=section_units_df.operate_index_last_year.sum(),
@@ -121,8 +133,14 @@ def create_approved_obj(section_units_df):
                                other_income=section_units_df.other_income.sum(),
                                avg_employee_last_year=section_units_df.avg_employee_last_year.sum(),
                                avg_employee=section_units_df.avg_employee.sum(),
-                               eff_index_1_name="人均利润", eff_index_2_name="人均营收",
-                               eff_index_1_weight=0.5, eff_index_2_weight=0.5)  # eff_indexes未确定，如果未触及70%条款则需修改
+                               eff_index_1_name=section_units_df.eff_index_1_name[0],
+                               eff_index_2_name=section_units_df.eff_index_2_name[0],
+                               eff_index_3_name=section_units_df.eff_index_3_name[0],
+                               eff_index_4_name=section_units_df.eff_index_4_name[0],
+                               eff_index_1_weight=section_units_df.eff_index_1_weight[0],
+                               eff_index_2_weight=section_units_df.eff_index_2_weight[0],
+                               eff_index_3_weight=section_units_df.eff_index_3_weight[0],
+                               eff_index_4_weight=section_units_df.eff_index_4_weight[0])  # eff_indexes未确定，如果未触及70%条款则需修改
     else:
         raise ValueError("%s: category error" % section_units_df.category[0])
     approved_obj.subcategory = "approved"
@@ -181,8 +199,14 @@ def create_section_obj(section_units_df):
                               other_income=section_units_df.other_income.sum(),
                               avg_employee_last_year=section_units_df.avg_employee_last_year.sum(),
                               avg_employee=section_units_df.avg_employee.sum(),
-                              eff_index_1_name="人均利润", eff_index_2_name="人均营收",
-                              eff_index_1_weight=0.5, eff_index_2_weight=0.5)
+                              eff_index_1_name=section_units_df.eff_index_1_name[0],
+                              eff_index_2_name=section_units_df.eff_index_2_name[0],
+                              eff_index_3_name=section_units_df.eff_index_3_name[0],
+                              eff_index_4_name=section_units_df.eff_index_4_name[0],
+                              eff_index_1_weight=section_units_df.eff_index_1_weight[0],
+                              eff_index_2_weight=section_units_df.eff_index_2_weight[0],
+                              eff_index_3_weight=section_units_df.eff_index_3_weight[0],
+                              eff_index_4_weight=section_units_df.eff_index_4_weight[0])
     elif section_units_df.category[0] == "Public":
         section_obj = Public(var_name="public_section", name="公共服务性板块合计",
                              package_last_year=section_units_df.package_last_year.sum(),
@@ -200,8 +224,14 @@ def create_section_obj(section_units_df):
                              other_income=section_units_df.other_income.sum(),
                              avg_employee_last_year=section_units_df.avg_employee_last_year.sum(),
                              avg_employee=section_units_df.avg_employee.sum(),
-                             eff_index_1_name="人均利润", eff_index_2_name="人均营收",
-                             eff_index_1_weight=0.5, eff_index_2_weight=0.5)
+                             eff_index_1_name=section_units_df.eff_index_1_name[0],
+                             eff_index_2_name=section_units_df.eff_index_2_name[0],
+                             eff_index_3_name=section_units_df.eff_index_3_name[0],
+                             eff_index_4_name=section_units_df.eff_index_4_name[0],
+                             eff_index_1_weight=section_units_df.eff_index_1_weight[0],
+                             eff_index_2_weight=section_units_df.eff_index_2_weight[0],
+                             eff_index_3_weight=section_units_df.eff_index_3_weight[0],
+                             eff_index_4_weight=section_units_df.eff_index_4_weight[0])
     elif section_units_df.category[0] == "Special":
         section_obj = Special(var_name="special_section", name="特殊功能性板块合计",
                               package_last_year=section_units_df.package_last_year.sum(),
@@ -227,8 +257,14 @@ def create_section_obj(section_units_df):
                               other_income=section_units_df.other_income.sum(),
                               avg_employee_last_year=section_units_df.avg_employee_last_year.sum(),
                               avg_employee=section_units_df.avg_employee.sum(),
-                              eff_index_1_name="人均利润", eff_index_2_name="人均营收",
-                              eff_index_1_weight=0.5, eff_index_2_weight=0.5)
+                              eff_index_1_name=section_units_df.eff_index_1_name[0],
+                              eff_index_2_name=section_units_df.eff_index_2_name[0],
+                              eff_index_3_name=section_units_df.eff_index_3_name[0],
+                              eff_index_4_name=section_units_df.eff_index_4_name[0],
+                              eff_index_1_weight=section_units_df.eff_index_1_weight[0],
+                              eff_index_2_weight=section_units_df.eff_index_2_weight[0],
+                              eff_index_3_weight=section_units_df.eff_index_3_weight[0],
+                              eff_index_4_weight=section_units_df.eff_index_4_weight[0])
     else:
         raise ValueError("%s call create_section_obj(): category error" % section_units_df.category[0])
     section_obj.subcategory = "section"

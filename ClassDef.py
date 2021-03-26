@@ -90,12 +90,12 @@ class Unit(object):
         self.eff_index_3_name = eff_index_3_name
         self.eff_index_4_name = eff_index_4_name
         self.eff_index_1_last_year = self.total_profit_last_year / self.avg_employee_last_year  # 默认人均净利润
-        self.eff_index_2_last_year = self.revenue_last_year / self.avg_employee_last_year  # 默认人均营收
-        self.eff_index_3_last_year = eff_index_3_last_year
+        self.eff_index_2_last_year = self.patmi_last_year / self.avg_employee_last_year  # 默认人均归母
+        self.eff_index_3_last_year = self.revenue_last_year / self.avg_employee_last_year  # 默认人均营收
         self.eff_index_4_last_year = eff_index_4_last_year
         self.eff_index_1 = self.total_profit / self.avg_employee
-        self.eff_index_2 = self.revenue / self.avg_employee
-        self.eff_index_3 = eff_index_3
+        self.eff_index_2 = self.patmi / self.avg_employee
+        self.eff_index_3 = self.revenue / self.avg_employee
         self.eff_index_4 = eff_index_4
         self.eff_index_1_weight = eff_index_1_weight
         self.eff_index_2_weight = eff_index_2_weight
