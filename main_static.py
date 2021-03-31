@@ -131,7 +131,11 @@ if __name__ == '__main__':
     results_df = rate_final_cal(results_df)
 
     """输出csv"""
+    results_chs_index = pd.read_csv("results_chs_index.csv")
+    results_chs_index_dict = results_chs_index.set_index("var_name").to_dict()["变量名称"]
     results_df.to_csv("results.csv", encoding="UTF-8", float_format='%.5f', index=False)
+
+    results_df = results_df.rename(columns=results_chs_index_dict)
     results_df.to_excel("results.xlsx", sheet_name="all", encoding="UTF-8", engine='xlsxwriter',
                         float_format='%.5f', index=False)
     print("输出完成，程序结束！")
