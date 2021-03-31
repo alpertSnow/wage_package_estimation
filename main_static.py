@@ -131,6 +131,7 @@ if __name__ == '__main__':
     results_df = rate_final_cal(results_df)
 
     """输出csv"""
+    print("采样完成，开始输出！")
     results_chs_index = pd.read_csv("results_chs_index.csv")
     results_chs_index_dict = results_chs_index.set_index("var_name").to_dict()["变量名称"]
     results_df.to_csv("results.csv", encoding="UTF-8", float_format='%.5f', index=False)

@@ -179,8 +179,8 @@ class Unit(object):
         self.defer_rate_3 = self.defer_3 / self.package_last_year
         self.package_3 = (1 + self.rate_3) * self.package_last_year
         self.total_package_3 = np.nansum(self.package_3 + self.defer_3 + self.deduct_3)
-        if self.defer_3 != 0.0:
-            tqdm.write("Warning: %s 有递延" % self.name)
+        # if self.defer_3 != 0.0:
+        #     tqdm.write("Warning: %s 有递延" % self.name)
 
     """第四步：如果是国资委批复，则最终批复 = 第三步计算结果"""
 
