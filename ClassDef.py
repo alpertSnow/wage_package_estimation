@@ -171,7 +171,7 @@ class Unit(object):
         if self.rate_2 - self.deduct_rate_3 > GZW_RATE_CAP:
             self.rate_3 = GZW_RATE_CAP
             # 套国资委递延公式
-            self.defer_3 = ((1 + self.rate_1) - (1 + self.rate_3)) / \
+            self.defer_3 = ((1 + self.rate_1) - (1 + GZW_RATE_CAP)) / \
                            ((1 / self.package_last_year) + 0.5 * 1 / self.total_profit_last_year)
         else:
             self.rate_3 = self.rate_2 - self.deduct_rate_3
@@ -242,21 +242,27 @@ class Compete(Unit):
 
     # 各家单位先扣减40%，然后自己套国资委的递延计算方法，得出工资总额+递延+扣减的总数（后面还需统一微调，即tune()）
     def rate_3_cal(self):
-        # TODO: 目前是先扣减，再递延，但是国资委公式里算出来的是递延+扣减，所以好像应该先算（递延+扣减）然后再扣40%
+        # 先算（递延+扣减）然后再扣减40%
         # 与Units.rate_3_cal()差别仅在与是否扣减40%
-        self.deduct_rate_3 = 0.0 if self.rate_2 <= 0 or self.subcategory == "approved" else self.rate_2 * 0.4
-        self.deduct_3 = self.package_last_year * self.deduct_rate_3
-
-        if self.rate_2 - self.deduct_rate_3 > GZW_RATE_CAP:
-            self.rate_3 = GZW_RATE_CAP
-            # 套用国资委递延计算函数
-            self.defer_3 = ((1 + self.rate_1) - (1 + self.rate_3)) / \
-                           ((1 / self.package_last_year) + 0.5 * 1 / self.total_profit_last_year) - self.deduct_3
+        if self.rate_2 > GZW_RATE_CAP:
+            # 若需要递延，则套用国资委递延计算函数，计算递延+扣减的总值
+            defer_plus_deduct = ((1 + self.rate_1) - (1 + GZW_RATE_CAP)) / \
+                                ((1 / self.package_last_year) + 0.5 * 1 / self.total_profit_last_year)
+            # 扣减值 = （递延+扣减+当年度工资帽）*40%；国资委批复不扣减
+            self.deduct_rate_3 = (defer_plus_deduct / self.package_last_year + GZW_RATE_CAP) * 0.4 if \
+                self.subcategory != "approved" else 0.0
+            # 当年工资增幅 = min（扣减后剩余额度，工资帽）；国资委批复不扣减
+            self.rate_3 = min(GZW_RATE_CAP, (defer_plus_deduct / self.package_last_year + GZW_RATE_CAP) * 0.6) if \
+                self.subcategory != "approved" else GZW_RATE_CAP
+            self.defer_rate_3 = defer_plus_deduct / self.package_last_year + GZW_RATE_CAP - self.deduct_rate_3 - self.rate_3
         else:
+            # 没到工资帽则不用递延。降工资则不扣减。增工资则直接扣减40%
+            self.deduct_rate_3 = 0.0 if self.rate_2 <= 0 or self.subcategory == "approved" else self.rate_2 * 0.4
             self.rate_3 = self.rate_2 - self.deduct_rate_3
-            self.defer_3 = 0.0
-        self.defer_rate_3 = self.defer_3 / self.package_last_year
+            self.defer_rate_3 = 0.0
         self.package_3 = (1 + self.rate_3) * self.package_last_year
+        self.defer_3 = self.defer_rate_3 * self.package_last_year
+        self.deduct_3 = self.deduct_rate_3 * self.package_last_year
         self.total_package_3 = np.nansum(self.package_3 + self.defer_3 + self.deduct_3)
 
 
