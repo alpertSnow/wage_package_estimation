@@ -123,9 +123,9 @@ class Unit(object):
     def rate_2_cal(self):
         global warned
         if self.category == "Public":
-            avg_town_wage_limit = 3
-        elif self.category == "Compete" or self.category == "Special":
             avg_town_wage_limit = 2.5
+        elif self.category == "Compete" or self.category == "Special":
+            avg_town_wage_limit = 3
         else:
             raise ValueError('%s call rate_2_cal(): category error' % self.var_name)
         self.rate_2 = self.rate_1
