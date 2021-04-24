@@ -4,6 +4,7 @@
 import pandas as pd
 from ClassDef import Compete  # 竞争类板块对象
 from ClassDef import Public  # 公共服务类板块对象
+from ClassDef import Special  # 特殊功能类类板块对象（此处用于壳公司与抵消对象）
 from ClassDef import SpecialGov  # 特殊功能类类板块对象（政府型）
 from ClassDef import SpecialMarket  # 特殊功能类类板块对象（经营型）
 from FnDef import create_approved_obj  # 创建板块批复对象
@@ -25,40 +26,22 @@ if __name__ == '__main__':
         exec(data['var_name'] + "=" + class_name + """(var_name=data['var_name'], name=data['name'], \
              package_last_year=data['package_last_year'], \
              total_profit_last_year=data['total_profit_last_year'], \
-             total_profit_last_year_elimination=data['total_profit_last_year_elimination'], \
-             patmi_last_year=data['patmi_last_year'], \
-             patmi_last_year_elimination=data['patmi_last_year_elimination'], \
+             patmi_self_last_year=data['patmi_self_last_year'], \
+             patmi_BII_last_year=data['patmi_BII_last_year'], \
              revenue_last_year=data['revenue_last_year'], \
-             revenue_last_year_elimination=data['revenue_last_year_elimination'], \
              cost_last_year=data['cost_last_year'], \
-             cost_last_year_elimination=data['cost_last_year_elimination'], \
              invest_income_last_year=data['invest_income_last_year'], \
              other_income_last_year=data['other_income_last_year'], \
              total_profit=data['total_profit'], \
-             total_profit_elimination=data['total_profit_elimination'], \
-             patmi=data['patmi'], \
-             patmi_elimination=data['patmi_elimination'], \
+             patmi_self=data['patmi_self'], \
+             patmi_BII=data['patmi_BII'], \
              revenue=data['revenue'], \
-             revenue_elimination=data['revenue_elimination'], \
              cost=data['cost'], \
-             cost_elimination=data['cost_elimination'], \
              invest_income=data['invest_income'], \
              other_income=data['other_income'], \
              avg_employee_last_year=data['avg_employee_last_year'], \
              avg_employee=data['avg_employee'], \
              key_score=data['key_score'], \
-             eff_index_1_name=data['eff_index_1_name'], \
-             eff_index_2_name=data['eff_index_2_name'], \
-             eff_index_3_name=data['eff_index_3_name'], \
-             eff_index_4_name=data['eff_index_4_name'], \
-             eff_index_1_last_year=data['eff_index_1_last_year'], \
-             eff_index_2_last_year=data['eff_index_2_last_year'], \
-             eff_index_3_last_year=data['eff_index_3_last_year'], \
-             eff_index_4_last_year=data['eff_index_4_last_year'], \
-             eff_index_1=data['eff_index_1'], \
-             eff_index_2=data['eff_index_2'], \
-             eff_index_3=data['eff_index_3'], \
-             eff_index_4=data['eff_index_4'], \
              eff_index_1_weight=data['eff_index_1_weight'], \
              eff_index_2_weight=data['eff_index_2_weight'], \
              eff_index_3_weight=data['eff_index_3_weight'], \
@@ -69,8 +52,6 @@ if __name__ == '__main__':
              quality_index=data['quality_index'], \
              cost_index=data['cost_index'], \
              operate_index=data['operate_index'], \
-             load_index_last_year=data['load_index_last_year'], \
-             load_index=data['load_index'], \
              financial_index_name=data['financial_index_name'])""")
 
     # 创建单位实例的列表

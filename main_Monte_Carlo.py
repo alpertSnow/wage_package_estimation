@@ -39,8 +39,8 @@ def do(thread, df1, df2, df3, df4):
                      package_last_year=data['package_last_year'], \
                      total_profit_last_year=data['total_profit_last_year'], \
                      total_profit_last_year_elimination=data['total_profit_last_year_elimination'], \
-                     patmi_last_year=data['patmi_last_year'], \
-                     patmi_last_year_elimination=data['patmi_last_year_elimination'], \
+                     patmi_self_last_year=data['patmi_self_last_year'], \
+                     patmi_self_last_year_elimination=data['patmi_self_last_year_elimination'], \
                      revenue_last_year=data['revenue_last_year'], \
                      revenue_last_year_elimination=data['revenue_last_year_elimination'], \
                      cost_last_year=data['cost_last_year'], \
@@ -49,7 +49,7 @@ def do(thread, df1, df2, df3, df4):
                      other_income_last_year=data['other_income_last_year'], \
                      total_profit=data['total_profit'], \
                      total_profit_elimination=data['total_profit_elimination'], \
-                     patmi=data['patmi'], \
+                     patmi_self=data['patmi_self'], \
                      patmi_elimination=data['patmi_elimination'], \
                      revenue=data['revenue'], \
                      revenue_elimination=data['revenue_elimination'], \
