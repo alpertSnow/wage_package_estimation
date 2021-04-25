@@ -3,6 +3,7 @@ import FnDef as fd
 from tqdm import tqdm
 from ConstVar import AVG_TOWN_WAGE
 from ConstVar import GZW_RATE_CAP
+from ConstVar import GZW_BASE_RATE
 from ConstVar import FINANCIAL_INDEX_LIMITS
 from ConstVar import GZW_score_converted_growth
 
@@ -163,8 +164,8 @@ class Unit(object):
         if self.rate_2 - self.deduct_rate_3 > GZW_RATE_CAP:
             self.rate_3 = GZW_RATE_CAP
             # 套国资委递延公式
-            self.defer_3 = ((1 + self.rate_1) - (1 + GZW_RATE_CAP)) / \
-                           ((1 / self.package_last_year) + 0.5 * 1 / self.total_profit_last_year)
+            self.defer_3 = ((1 + self.rate_2) - (1 + GZW_RATE_CAP)) / \
+                           ((1 / self.package_last_year) + 0.5 * 1 / abs(self.total_profit_last_year))
         else:
             self.rate_3 = self.rate_2 - self.deduct_rate_3
             self.defer_3 = 0.0
@@ -233,8 +234,9 @@ class Compete(Unit):
         # 与Units.rate_3_cal()差别仅在与是否扣减40%
         if self.rate_2 > GZW_RATE_CAP:
             # 若需要递延，则套用国资委递延计算函数，计算递延+扣减的总值
-            defer_plus_deduct = ((1 + self.rate_1) - (1 + GZW_RATE_CAP)) / \
-                                ((1 / self.package_last_year) + 0.5 * 1 / self.total_profit_last_year)
+            # TODO: 增幅如果打折，则利润应该也打折
+            defer_plus_deduct = ((1 + self.rate_2) - (1 + GZW_RATE_CAP)) / \
+                                ((1 / self.package_last_year) + 0.5 * 1 / abs(self.total_profit_last_year))
             # 扣减值 = （递延+扣减+当年度工资帽）*40%；国资委批复不扣减
             self.deduct_rate_3 = (defer_plus_deduct / self.package_last_year + GZW_RATE_CAP) * 0.4 if \
                 self.subcategory != "approved" else 0.0
@@ -403,6 +405,10 @@ class SpecialGov(Special):
     def rate_1_cal(self):
         self.rate_1 = self.key_score_converted_growth
 
+    # 对于特殊功能板块，人均生产率指标不生效
+    def rate_2_cal(self):
+        self.rate_2 = self.rate_1
+
 
 class SpecialMarket(Special):
     def __init__(self, var_name, name, package_last_year=np.nan,
@@ -452,13 +458,20 @@ class SpecialMarket(Special):
             raise ValueError('%s: wrong financial index' % self.name)
         self.financial_index_limited = np.nan
 
+    """公司人力资源部每年根据市国资委核定我公司特殊功能类板块整体工资总额增幅情况确定基准增幅。
+    各经营单位归母净利润每增长（下降）5%，工资总额增幅增加（减少）0.5%，增加（减少）最多不超过1.5%；
+    年底经营业绩考核得分在100分基准上每增加（扣减）1分，工资总额增幅增加（减少）0.15%。"""
     def rate_1_cal(self):
-        if self.financial_index_growth < FINANCIAL_INDEX_LIMITS[0]:
+        if 0.2 * self.financial_index_growth < FINANCIAL_INDEX_LIMITS[0]:
             self.financial_index_limited = -1
-            self.rate_1 = 0.5 * self.key_score_converted_growth + 0.5 * FINANCIAL_INDEX_LIMITS[0]
-        elif self.financial_index_growth > FINANCIAL_INDEX_LIMITS[1]:
+            self.rate_1 = 0.5 * self.key_score_converted_growth + 0.5 * (FINANCIAL_INDEX_LIMITS[0] + GZW_BASE_RATE)
+        elif 0.2 * self.financial_index_growth > FINANCIAL_INDEX_LIMITS[1]:
             self.financial_index_limited = 1
-            self.rate_1 = 0.5 * self.key_score_converted_growth + 0.5 * FINANCIAL_INDEX_LIMITS[1]
+            self.rate_1 = 0.5 * self.key_score_converted_growth + 0.5 * (FINANCIAL_INDEX_LIMITS[1] + GZW_BASE_RATE)
         else:
             self.financial_index_limited = 0
-            self.rate_1 = 0.5 * self.key_score_converted_growth + 0.5 * self.financial_index_growth
+            self.rate_1 = 0.5 * self.key_score_converted_growth + 0.5 * (0.2 * self.financial_index_growth + GZW_BASE_RATE)
+
+    # 对于特殊功能板块，人均生产率指标不生效
+    def rate_2_cal(self):
+        self.rate_2 = self.rate_1

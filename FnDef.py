@@ -10,10 +10,10 @@ import numpy as np
 
 
 # 重点工作计划如何折算为增幅指标
-def key_score_convert(key_score):
-    # TODO: 以100为零增幅线性折算
+def key_score_convert(key_score, base_rate=GZW_BASE_RATE):
     """线性折算"""
-    key_score_converted_growth = (key_score - 80) / 20 * GZW_BASE_RATE
+    """110分：6%，110分：3%"""
+    key_score_converted_growth = (key_score - 90) / 10 * base_rate
     return key_score_converted_growth
 
 
