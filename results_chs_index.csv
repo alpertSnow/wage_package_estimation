@@ -2,12 +2,15 @@ var_name,变量名称
 name,单位/板块名称
 category,板块
 subcategory,子版块/标签
-package_last_year,上年度工资总额（万元）
+package_last_year,上年度工资总额
+defer_last_year,上年度递延
+distributable_last_year,可统筹支配
 total_package_3,总包（递延后 微调前）
 total_package_final,总包（最终）
 package_2,工资总额（打折后 递延前）
 package_3,工资总额（递延后 微调前）
 package_final,工资总额（最终）
+package_real,实际可发工资总额（考虑上年度统筹与递延）
 defer_3,递延额（递延后 微调前）
 defer_final,递延额（最终）
 deduct_3,竞争性板块扣减额（递延后 微调前）
@@ -16,12 +19,14 @@ rate_1,工资总额基础增幅
 rate_2,工资总额增幅（打折后 递延前）
 rate_3,工资总额增幅（递延后 微调前）
 rate_final,工资总额增幅（最终）
+rate_real,实际可发工资总额增幅
 defer_rate_3,递延/上年度工资总额（递延后 微调前）
 defer_rate_final,递延/上年度工资总额（最终）
 deduct_rate_3,扣减/上年度工资总额（递延后 微调前）
 deduct_rate_final,扣减/上年度工资总额（最终）
-avg_wage_last_year,上年度平均工资（万元）
-avg_wage_final,本年度平均工资（万元）
+avg_wage_last_year,上年度平均工资
+avg_wage_final,本年度平均工资
+avg_wage_real,实际可发平均工资
 avg_employee_last_year,上年度平均人数
 avg_employee,本年度平均人数
 tune_total_package_coeff,板块微调系数

@@ -52,6 +52,8 @@ def create_approved_obj(section_units_df):
         """竞争板块总额中不进行关联交易剔除"""
         approved_obj = Compete(var_name="compete_approved", name="竞争性板块国资委批复",
                                package_last_year=section_units_df.package_last_year.sum(),
+                               defer_last_year=section_units_df.defer_last_year.sum(),
+                               distributable_last_year=section_units_df.distributable_last_year.sum(),
                                total_profit_last_year=section_units_df.total_profit_last_year.sum(),
                                patmi_self_last_year=section_units_df.patmi_self_last_year.sum(),
                                patmi_BII_last_year=section_units_df.patmi_BII_last_year.sum(),
@@ -76,6 +78,8 @@ def create_approved_obj(section_units_df):
         """公共服务类板块总额中不进行关联交易剔除"""
         approved_obj = Public(var_name="public_approved", name="公共服务性板块国资委批复",
                               package_last_year=section_units_df.package_last_year.sum(),
+                              defer_last_year=section_units_df.defer_last_year.sum(),
+                              distributable_last_year=section_units_df.distributable_last_year.sum(),
                               total_profit_last_year=section_units_df.total_profit_last_year.sum(),
                               patmi_self_last_year=section_units_df.patmi_self_last_year.sum(),
                               patmi_BII_last_year=section_units_df.patmi_BII_last_year.sum(),
@@ -106,6 +110,8 @@ def create_approved_obj(section_units_df):
 
         approved_obj = Special(var_name="special_approved", name="特殊功能性板块国资委批复",
                                package_last_year=section_units_df.package_last_year.sum(),
+                               defer_last_year=section_units_df.defer_last_year.sum(),
+                               distributable_last_year=section_units_df.distributable_last_year.sum(),
                                total_profit_last_year=section_units_df.total_profit_last_year.sum(),
                                patmi_self_last_year=section_units_df.patmi_self_last_year.sum(),
                                patmi_BII_last_year=section_units_df.patmi_BII_last_year.sum(),
@@ -133,13 +139,18 @@ def create_approved_obj(section_units_df):
 
 
 # 平账微调
-def tune(section_units_df, section_total_package_3, approved_package, approved_defer):
+def tune(section_units_df, approved_package, approved_defer):
     df = section_units_df
-    tune_1 = (approved_package + approved_defer) / section_total_package_3
+    section_total_package_3 = df.total_package_3.sum()
+    section_distributable_last_year = df.distributable_last_year.sum()
+    if (approved_package + approved_defer + section_distributable_last_year) < section_total_package_3:
+        tune_1 = (approved_package + approved_defer + section_distributable_last_year) / section_total_package_3
+    else:
+        tune_1 = 1
+
     for j in df.index:
-        # 版块总包限制在批复总包以内
-        df.loc[j, "total_package_final"] = df.loc[j, "total_package_3"] * tune_1 if tune_1 < 1 else \
-            df.loc[j, "total_package_3"]
+        # 分配上年度可分配工资总额，将版块总包限制在批复总包+可支配额度以内
+        df.loc[j, "total_package_final"] = df.loc[j, "total_package_3"] * tune_1
         # 对竞争性板块执行扣除
         df.loc[j, "deduct_final"] = (df.loc[j, "total_package_final"] - df.loc[j, "package_last_year"]) * 0.4 if \
             (df.loc[j, "total_package_final"] - df.loc[j, "package_last_year"]) > 0 and df.category[
@@ -152,11 +163,12 @@ def tune(section_units_df, section_total_package_3, approved_package, approved_d
         # 计算递延=总包-总额-扣减
         df.loc[j, "defer_final"] = df.loc[j, "total_package_final"] - df.loc[j, "package_final"] - df.loc[
             j, "deduct_final"]
+        # 计算实际可发工资总额=final总额+本单位上年度递延
+        df.loc[j, "package_real"] = np.nansum([df.loc[j, "package_final"], df.loc[j, "defer_last_year"]])
         # 计算总包的微调系数
-        df.loc[j, "tune_total_package_coeff"] = df.loc[j, "total_package_final"] / df.loc[j, "total_package_3"]
+        df.loc[j, "tune_total_package_coeff"] = tune_1
     # 检查错误
-    if df.total_package_final.sum() > approved_package + approved_defer + TOLERANCE or \
-            df.package_final.sum() > approved_package + TOLERANCE:
+    if df.total_package_final.sum() > approved_package + approved_defer + section_distributable_last_year + TOLERANCE:
         tqdm.write(df)
         raise ValueError('%s call tune(): 微调平账时出错！' % section_units_df.name[0])
     return df
@@ -170,6 +182,8 @@ def create_section_obj(section_units_df):
     if section_units_df.category[0] == "Compete":
         section_obj = Compete(var_name="compete_section", name="竞争性板块合计",
                               package_last_year=section_units_df.package_last_year.sum(),
+                              defer_last_year=section_units_df.defer_last_year.sum(),
+                              distributable_last_year=section_units_df.distributable_last_year.sum(),
                               total_profit_last_year=section_units_df.total_profit_last_year.sum(),
                               patmi_self_last_year=section_units_df.patmi_self_last_year.sum(),
                               patmi_BII_last_year=section_units_df.patmi_BII_last_year.sum(),
@@ -193,6 +207,8 @@ def create_section_obj(section_units_df):
     elif section_units_df.category[0] == "Public":
         section_obj = Public(var_name="public_section", name="公共服务性板块合计",
                              package_last_year=section_units_df.package_last_year.sum(),
+                             defer_last_year=section_units_df.defer_last_year.sum(),
+                             distributable_last_year=section_units_df.distributable_last_year.sum(),
                              total_profit_last_year=section_units_df.total_profit_last_year.sum(),
                              patmi_self_last_year=section_units_df.patmi_self_last_year.sum(),
                              patmi_BII_last_year=section_units_df.patmi_BII_last_year.sum(),
@@ -216,6 +232,8 @@ def create_section_obj(section_units_df):
     elif section_units_df.category[0] == "Special":
         section_obj = Special(var_name="special_section", name="特殊功能性板块合计",
                               package_last_year=section_units_df.package_last_year.sum(),
+                              defer_last_year=section_units_df.defer_last_year.sum(),
+                              distributable_last_year=section_units_df.distributable_last_year.sum(),
                               total_profit_last_year=section_units_df.total_profit_last_year.sum(),
                               patmi_self_last_year=section_units_df.patmi_self_last_year.sum(),
                               patmi_BII_last_year=section_units_df.patmi_self_last_year.sum(),
@@ -250,6 +268,7 @@ def section_cal(section_obj, section_units_df):
     obj.package_2 = df.package_2.sum()
     obj.package_3 = df.package_3.sum()
     obj.package_final = df.package_final.sum()
+    obj.package_real = df.package_real.sum()
     obj.defer_3 = df.defer_3.sum()
     obj.defer_final = df.defer_final.sum()
     obj.deduct_3 = df.deduct_3.sum()
@@ -272,7 +291,9 @@ def section_concat(section_units_df, obj):
 # 最后计算
 def rate_final_cal(df):
     df.rate_final = df.package_final / df.package_last_year - 1
+    df.rate_real = df.package_real / df.package_last_year - 1
     df.defer_rate_final = df.defer_final / df.package_last_year
     df.deduct_rate_final = df.deduct_final / df.package_last_year
     df.avg_wage_final = df.package_final / df.avg_employee
+    df.avg_wage_real = df.package_real / df.avg_employee
     return df

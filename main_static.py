@@ -25,6 +25,8 @@ if __name__ == '__main__':
         class_name = data['category'] + data['subcategory']
         exec(data['var_name'] + "=" + class_name + """(var_name=data['var_name'], name=data['name'], \
              package_last_year=data['package_last_year'], \
+             defer_last_year=data['defer_last_year'], \
+             distributable_last_year=data['distributable_last_year'], \
              total_profit_last_year=data['total_profit_last_year'], \
              patmi_self_last_year=data['patmi_self_last_year'], \
              patmi_BII_last_year=data['patmi_BII_last_year'], \
@@ -93,7 +95,7 @@ if __name__ == '__main__':
         section_total_package_3_list.append(section_df_list[i].total_package_3.sum())
 
         # 微调平账
-        section_df_list[i] = tune(section_df_list[i], section_total_package_3_list[i],
+        section_df_list[i] = tune(section_df_list[i],
                                   approved_obj_list[i].package_final, approved_obj_list[i].defer_final)
         # 创建版块合计对象
         section_obj_list.append(create_section_obj(section_df_list[i]))
