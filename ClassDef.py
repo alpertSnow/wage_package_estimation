@@ -32,6 +32,7 @@ class Unit(object):
         self.distributable_last_year = distributable_last_year
         self.total_package_3 = np.nan
         self.total_package_final = np.nan
+        self.total_package_real = np.nan
         self.package_2 = np.nan
         self.package_3 = np.nan
         self.package_final = np.nan
@@ -187,7 +188,8 @@ class Unit(object):
             self.package_real = self.package_final + self.defer_last_year + self.distributable_last_year
             self.defer_final = self.defer_3
             self.deduct_final = self.deduct_3
-            self.total_package_final = np.nansum(self.package_final + self.defer_final + self.deduct_final)
+            self.total_package_final = np.nansum([self.package_final, self.defer_final, self.deduct_final])
+            self.total_package_real = np.nansum([self.package_real, self.defer_final, self.deduct_final])
         else:
             raise ValueError('%s不是国资委批复！' % self.var_name)
 
@@ -240,7 +242,7 @@ class Compete(Unit):
         self.package_3 = (1 + self.rate_3) * self.package_last_year
         self.defer_3 = self.defer_rate_3 * self.package_last_year
         self.deduct_3 = self.deduct_rate_3 * self.package_last_year
-        self.total_package_3 = np.nansum(self.package_3 + self.defer_3 + self.deduct_3)
+        self.total_package_3 = np.nansum([self.package_3, self.defer_3, self.deduct_3])
 
 
 class Public(Unit):

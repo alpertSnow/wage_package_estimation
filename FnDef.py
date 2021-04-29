@@ -165,6 +165,9 @@ def tune(section_units_df, approved_package, approved_defer):
             j, "deduct_final"]
         # 计算实际可发工资总额=final总额+本单位上年度递延
         df.loc[j, "package_real"] = np.nansum([df.loc[j, "package_final"], df.loc[j, "defer_last_year"]])
+        # 计算考虑上年递延后的总包
+        df.loc[j, "total_package_real"] = np.nansum([df.loc[j, "package_real"], df.loc[j, "defer_final"],
+                                                     df.loc[j, "deduct_final"]])
         # 计算总包的微调系数
         df.loc[j, "tune_total_package_coeff"] = tune_1
     # 检查错误
@@ -265,6 +268,7 @@ def section_cal(section_obj, section_units_df):
     [obj, df] = [section_obj, section_units_df]
     obj.total_package_3 = df.total_package_3.sum()
     obj.total_package_final = df.total_package_final.sum()
+    obj.total_package_real = df.total_package_real.sum()
     obj.package_2 = df.package_2.sum()
     obj.package_3 = df.package_3.sum()
     obj.package_final = df.package_final.sum()

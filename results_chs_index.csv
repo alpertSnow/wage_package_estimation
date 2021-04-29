@@ -7,6 +7,7 @@ defer_last_year,上年度递延
 distributable_last_year,可统筹支配
 total_package_3,总包（递延后 微调前）
 total_package_final,总包（最终）
+total_package_real,总包（考虑上年度统筹与递延）
 package_2,工资总额（打折后 递延前）
 package_3,工资总额（递延后 微调前）
 package_final,工资总额（最终）
