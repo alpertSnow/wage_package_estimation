@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pandas as pd
+import warnings
 from ClassDef import Compete  # 竞争类板块对象
 from ClassDef import Public  # 公共服务类板块对象
 from ClassDef import Special  # 特殊功能类类板块对象（此处用于壳公司与抵消对象）
@@ -14,6 +15,7 @@ from FnDef import section_cal  # 各单位rate_1~3计算完成后，创建sectio
 from FnDef import section_concat  # 将板块对象section合并入对应板块列表
 from FnDef import rate_final_cal  # 最后收尾计算
 pd.options.mode.chained_assignment = None  # default='warn'
+warnings.filterwarnings('ignore', category=RuntimeWarning)
 
 """Unit: 万元，人"""
 
