@@ -140,21 +140,22 @@ class Unit(object):
                 tqdm.write("Warning: %s效益提升，去年平均工资<%s*AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
                            (self.var_name, avg_town_wage_limit))
         elif self.rate_1 < 0:
-            if self.eff_growth > 0 or self.avg_wage_last_year <= AVG_TOWN_WAGE:
+            if self.avg_wage_last_year <= AVG_TOWN_WAGE:
                 self.rate_2 = 0.4 * self.rate_1
-            # 人工成本投入产出指标应计算的报警
-            elif self.category == "Compete" and self.subcategory == "approved" and warned[0] == 0:
-                warned[0] = 1
-                tqdm.write("Warning: %s效益下降，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标下降，人工成本投入产出率指标(未计算)可能生效" %
-                           self.var_name)
-            elif self.category == "Public" and self.subcategory == "approved" and warned[1] == 0:
-                warned[1] = 1
-                tqdm.write("Warning: %s效益下降，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标下降，人工成本投入产出率指标(未计算)可能生效" %
-                           self.var_name)
-            elif self.category == "Special" and self.subcategory == "approved" and warned[2] == 0:
-                warned[2] = 1
-                tqdm.write("Warning: %s效益下降，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标下降，人工成本投入产出率指标(未计算)可能生效" %
-                           self.var_name)
+            elif self.eff_growth > 0:
+                # 人工成本投入产出指标应计算的报警
+                if self.category == "Compete" and self.subcategory == "approved" and warned[0] == 0:
+                    warned[0] = 1
+                    tqdm.write("Warning: %s效益提升，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
+                               self.var_name)
+                elif self.category == "Public" and self.subcategory == "approved" and warned[1] == 0:
+                    warned[1] = 1
+                    tqdm.write("Warning: %s效益提升，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
+                               self.var_name)
+                elif self.category == "Special" and self.subcategory == "approved" and warned[2] == 0:
+                    warned[2] = 1
+                    tqdm.write("Warning: %s效益提升，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
+                               self.var_name)
         self.package_2 = self.package_last_year * (1 + self.rate_2)
 
     """第三步：水平调控"""
