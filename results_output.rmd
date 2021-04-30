@@ -1,0 +1,46 @@
+---
+title: "results_output"
+author: "Fei Xue"
+date: "2021/4/30"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(kableExtra)
+library(scales)
+library(flextable)
+```
+
+```{r read_data, echo=FALSE}
+data <- read.csv("results.csv", encoding = "UTF-8")
+data.zhuangbei <- read.csv("results-zhuangbei.csv", encoding = "UTF-8") %>% filter(subcategory=="")
+```
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r compete_section_table, results='asis'}
+df.1 <- data %>% filter(category=="Compete" & subcategory=="") %>%
+    bind_rows(data.zhuangbei) %>% select(c(name, package_last_year, rate_real, package_real))
+df.1$rate_real <- percent(df.1$rate_real, accuracy = 0.01)
+# knitr::kable(df.1, caption="竞争类板块测算情况", digits=2, align="r") %>% kable_styling("striped")
+regulartable(df.1)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
