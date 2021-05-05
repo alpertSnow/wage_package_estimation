@@ -143,37 +143,37 @@ def tune(section_units_df, approved_package, approved_defer):
     df = section_units_df
     section_total_package_3 = df.total_package_3.sum()
     section_distributable_last_year = df.distributable_last_year.sum()
-    if (approved_package + approved_defer + section_distributable_last_year) < section_total_package_3:
-        tune_1 = (approved_package + approved_defer + section_distributable_last_year) / section_total_package_3
+    if section_total_package_3 <= (approved_package + approved_defer + section_distributable_last_year):
+        alpha = 1
+        beta = 1
     else:
-        tune_1 = 1
+        if df.package_3.sum() > (approved_package + section_distributable_last_year):
+            alpha = 1
+            beta = (approved_package + approved_defer + section_distributable_last_year) / section_total_package_3
+        else:
+            alpha = (approved_package + approved_defer + section_distributable_last_year - df.package_3.sum()) / \
+                    np.nansum([df.defer_3.sum(), df.deduct_3.sum()])
+            beta = 1
 
     for j in df.index:
-        # 分配上年度可分配工资总额，将版块总包限制在批复总包+可支配额度以内
-        df.loc[j, "total_package_final"] = df.loc[j, "total_package_3"] * tune_1
-        # 对竞争性板块执行扣除
-        df.loc[j, "deduct_final"] = (df.loc[j, "total_package_final"] - df.loc[j, "package_last_year"]) * 0.4 if \
-            (df.loc[j, "total_package_final"] - df.loc[j, "package_last_year"]) > 0 and df.category[
-                0] == "Compete" else 0.0
-        # 计算工资总额，将竞争性板块限制在去年总额*(1+GZW_RATE_CAP)以内
-        df.loc[j, "package_final"] = df.loc[j, "package_last_year"] * (1 + GZW_RATE_CAP) if \
-            df.loc[j, "total_package_final"] - df.loc[j, "deduct_final"] > \
-            df.loc[j, "package_last_year"] * (1 + GZW_RATE_CAP) and df.category[0] == "Compete" else \
-            df.loc[j, "total_package_final"] - df.loc[j, "deduct_final"]
-        # 计算递延=总包-总额-扣减
-        df.loc[j, "defer_final"] = df.loc[j, "total_package_final"] - df.loc[j, "package_final"] - df.loc[
-            j, "deduct_final"]
+        df.loc[j, "package_final"] = df.loc[j, "package_3"] * beta
+        df.loc[j, "defer_final"] = df.loc[j, "defer_3"] * alpha * beta
+        if section_total_package_3 <= (approved_package + approved_defer + section_distributable_last_year):
+            df.loc[df.index[0], "deduct_final"] = np.nansum([df.deduct_3.sum(), approved_package, approved_defer,
+                                                             section_distributable_last_year,
+                                                             - section_total_package_3])
+        else:
+            df.loc[j, "deduct_final"] = df.loc[j, "deduct_3"] * alpha * beta
+        df.loc[j, "total_package_final"] = np.nansum([df.loc[j, "package_final"], df.loc[j, "defer_final"],
+                                                      df.loc[j, "deduct_final"]])
         # 计算实际可发工资总额=final总额+本单位上年度递延
         df.loc[j, "package_real"] = np.nansum([df.loc[j, "package_final"], df.loc[j, "defer_last_year"]])
         # 计算考虑上年递延后的总包
         df.loc[j, "total_package_real"] = np.nansum([df.loc[j, "package_real"], df.loc[j, "defer_final"],
                                                      df.loc[j, "deduct_final"]])
         # 计算总包的微调系数
-        df.loc[j, "tune_total_package_coeff"] = tune_1
-    # 检查错误
-    if df.total_package_final.sum() > approved_package + approved_defer + section_distributable_last_year + TOLERANCE:
-        tqdm.write(df)
-        raise ValueError('%s call tune(): 微调平账时出错！' % section_units_df.name[0])
+        df.loc[j, "tune_total_package_coeff"] = df.loc[j, "total_package_final"] / df.loc[j, "total_package_3"]
+
     return df
 
 
