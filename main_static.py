@@ -36,6 +36,7 @@ if __name__ == '__main__':
              cost_last_year=data['cost_last_year'], \
              invest_income_last_year=data['invest_income_last_year'], \
              other_income_last_year=data['other_income_last_year'], \
+             labor_cost_last_year=data['labor_cost_last_year'], \
              total_profit=data['total_profit'], \
              patmi_self=data['patmi_self'], \
              patmi_BII=data['patmi_BII'], \
@@ -43,6 +44,7 @@ if __name__ == '__main__':
              cost=data['cost'], \
              invest_income=data['invest_income'], \
              other_income=data['other_income'], \
+             labor_cost=data['labor_cost'], \
              avg_employee_last_year=data['avg_employee_last_year'], \
              avg_employee=data['avg_employee'], \
              key_score=data['key_score'], \

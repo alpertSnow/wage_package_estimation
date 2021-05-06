@@ -17,9 +17,9 @@ class Unit(object):
                  defer_last_year=np.nan, distributable_last_year=np.nan,
                  total_profit_last_year=np.nan, patmi_self_last_year=np.nan, patmi_BII_last_year=np.nan,
                  revenue_last_year=np.nan, cost_last_year=np.nan,
-                 invest_income_last_year=np.nan, other_income_last_year=np.nan,
+                 invest_income_last_year=np.nan, other_income_last_year=np.nan, labor_cost_last_year=np.nan,
                  total_profit=np.nan, patmi_self=np.nan, patmi_BII=np.nan,
-                 revenue=np.nan, cost=np.nan, invest_income=np.nan, other_income=np.nan,
+                 revenue=np.nan, cost=np.nan, invest_income=np.nan, other_income=np.nan, labor_cost=np.nan,
                  avg_employee_last_year=np.nan, avg_employee=np.nan, key_score=np.nan,
                  eff_index_1_weight=np.nan, eff_index_2_weight=np.nan,
                  eff_index_3_weight=np.nan, eff_index_4_weight=np.nan):
@@ -50,11 +50,6 @@ class Unit(object):
         self.defer_rate_final = np.nan
         self.deduct_rate_3 = np.nan
         self.deduct_rate_final = np.nan
-        self.avg_wage_last_year = np.divide(package_last_year, avg_employee_last_year)
-        self.avg_wage_final = np.nan
-        self.avg_wage_real = np.nan
-        self.avg_employee_last_year = avg_employee_last_year
-        self.avg_employee = avg_employee
         self.tune_total_package_coeff = np.nan  # 微调平账的调整系数:当年总包=实发+递延+扣减
         self.total_profit_last_year = total_profit_last_year
         self.patmi_self_last_year = patmi_self_last_year  # 归母净利润Profit After Tax and Minority Interests
@@ -63,6 +58,7 @@ class Unit(object):
         self.cost_last_year = cost_last_year
         self.invest_income_last_year = invest_income_last_year
         self.other_income_last_year = other_income_last_year
+        self.labor_cost_last_year = labor_cost_last_year
         self.total_profit = total_profit
         self.patmi_self = patmi_self
         self.patmi_BII = patmi_BII
@@ -70,6 +66,7 @@ class Unit(object):
         self.cost = cost
         self.invest_income = invest_income
         self.other_income = other_income
+        self.labor_cost = labor_cost
         self.total_profit_growth = np.divide((self.total_profit - self.total_profit_last_year),
                                              abs(self.total_profit_last_year))
         self.patmi_self_growth = np.divide((self.patmi_self - self.patmi_self_last_year),
@@ -78,6 +75,14 @@ class Unit(object):
         self.revenue_growth = np.divide((self.revenue - self.revenue_last_year), abs(self.revenue_last_year))
         self.key_score = key_score
         self.key_score_converted_growth = fd.key_score_convert(self.key_score)
+        # 除特殊版块对象以外：成本费用占收入比=营业总成本/营收。升高为劣化
+        self.cost_income_ratio_last_year = np.divide(self.cost_last_year, self.revenue_last_year)
+        self.cost_income_ratio = np.divide(self.cost, self.revenue)
+        self.cost_income_ratio_growth = - np.divide((self.cost_income_ratio -
+                                                     self.cost_income_ratio_last_year),
+                                                    abs(self.cost_income_ratio_last_year))
+        self.avg_employee_last_year = avg_employee_last_year
+        self.avg_employee = avg_employee
         self.eff_index_1_last_year = np.divide(self.total_profit_last_year, self.avg_employee_last_year)  # 默认人均净利润
         self.eff_index_2_last_year = np.divide(self.patmi_self_last_year, self.avg_employee_last_year)  # 默认人均归母
         self.eff_index_3_last_year = np.divide(self.patmi_BII_last_year, self.avg_employee_last_year)  # 默认人均归母
@@ -102,12 +107,26 @@ class Unit(object):
                                         self.eff_index_3_growth, self.eff_index_4_growth])
         eff_indexes_weights = np.array([self.eff_index_1_weight, self.eff_index_2_weight,
                                         self.eff_index_3_weight, self.eff_index_4_weight])
+        # 人事费用率=人工成本/营收。升高为劣化
+        self.labor_revenue_ratio_last_year = np.divide(self.labor_cost_last_year, self.revenue_last_year)
+        self.labor_revenue_ratio = np.divide(self.labor_cost, self.revenue)
+        self.labor_revenue_ratio_growth = - np.divide((self.labor_revenue_ratio -
+                                                       self.labor_revenue_ratio_last_year),
+                                                      abs(self.labor_revenue_ratio_last_year))
+        # 人事费用率=人工成本/营收。升高为优化
+        self.profit_labor_ratio_last_year = np.divide(self.total_profit_last_year, self.labor_cost_last_year)
+        self.profit_labor_ratio = np.divide(self.total_profit, self.labor_cost)
+        self.profit_labor_ratio_growth = np.divide((self.profit_labor_ratio -
+                                                    self.profit_labor_ratio_last_year),
+                                                   abs(self.profit_labor_ratio_last_year))
         self.eff_growth = np.nansum(eff_indexes_growths * eff_indexes_weights)
-        self.cost_income_ratio_last_year = np.divide(self.cost_last_year, self.revenue_last_year)
-        self.cost_income_ratio = np.divide(self.cost, self.revenue)
-        self.cost_income_ratio_growth = - np.divide((self.cost_income_ratio -
-                                                     self.cost_income_ratio_last_year),
-                                                    abs(self.cost_income_ratio_last_year))
+        # 平均加权得到人工成本投入产出率
+        self.labor_eff_growth = np.nanmean([self.labor_revenue_ratio_growth, self.profit_labor_ratio_growth])
+        self.avg_wage_last_year = np.divide(package_last_year, avg_employee_last_year)
+        self.avg_wage_final = np.nan
+        self.avg_wage_real = np.nan
+
+
         # 检查输入参数
         if np.nansum(eff_indexes_weights) != 1:
             raise Warning("%s效率指标权重加和不等于1！" % self.name)
@@ -115,7 +134,12 @@ class Unit(object):
     """第二步：效率调整"""
 
     def rate_2_cal(self):
-        global warned
+        """企业经济效益增长的，对于当年劳动生产率、人工成本投入产出率未提高，
+        或者竞争类、特殊功能类企业2019年职工平均工资达到全国城镇单位就业人员平均工资3倍以上，
+        城市公共服务类企业达到2.5倍以上的，工资总额增幅不超过经济效益增幅的70%。
+        企业经济效益下降的，除受政策调整等非经营性因素影响外，当年工资总额原则上相应下降。
+        对于当年劳动生产率、人工成本投入产出率未下降，或者2019年职工平均工资未达到全国城镇单位就业人员平均工资的，
+        当年工资总额降幅在经济效益降幅的40%范围内确定。"""
         if self.category == "Public":
             avg_town_wage_limit = 2.5
         elif self.category == "Compete" or self.category == "Special":
@@ -124,38 +148,14 @@ class Unit(object):
             raise ValueError('%s call rate_2_cal(): category error' % self.var_name)
         self.rate_2 = self.rate_1
         if self.rate_1 >= 0:
-            if self.eff_growth < 0 or self.avg_wage_last_year > AVG_TOWN_WAGE * avg_town_wage_limit:
+            if self.eff_growth < 0 or self.labor_eff_growth < 0 or \
+                    self.avg_wage_last_year > AVG_TOWN_WAGE * avg_town_wage_limit:
                 self.rate_2 = 0.7 * self.rate_1
-            # 人工成本投入产出指标应计算的报警
-            elif self.category == "Compete" and self.subcategory == "approved" and warned[0] == 0:
-                warned[0] = 1
-                tqdm.write("Warning: %s效益提升，去年平均工资<%s*AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
-                           (self.var_name, avg_town_wage_limit))
-            elif self.category == "Public" and self.subcategory == "approved" and warned[1] == 0:
-                warned[1] = 1
-                tqdm.write("Warning: %s效益提升，去年平均工资<%s*AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
-                           (self.var_name, avg_town_wage_limit))
-            elif self.category == "Special" and self.subcategory == "approved" and warned[2] == 0:
-                warned[2] = 1
-                tqdm.write("Warning: %s效益提升，去年平均工资<%s*AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
-                           (self.var_name, avg_town_wage_limit))
         elif self.rate_1 < 0:
             if self.avg_wage_last_year <= AVG_TOWN_WAGE:
                 self.rate_2 = 0.4 * self.rate_1
-            elif self.eff_growth > 0:
-                # 人工成本投入产出指标应计算的报警
-                if self.category == "Compete" and self.subcategory == "approved" and warned[0] == 0:
-                    warned[0] = 1
-                    tqdm.write("Warning: %s效益提升，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
-                               self.var_name)
-                elif self.category == "Public" and self.subcategory == "approved" and warned[1] == 0:
-                    warned[1] = 1
-                    tqdm.write("Warning: %s效益提升，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
-                               self.var_name)
-                elif self.category == "Special" and self.subcategory == "approved" and warned[2] == 0:
-                    warned[2] = 1
-                    tqdm.write("Warning: %s效益提升，去年平均工资>AVG_TOWN_WAGE且劳动生产率指标提升，人工成本投入产出率指标(未计算)可能生效" %
-                               self.var_name)
+            elif self.eff_growth > 0 and self.labor_eff_growth > 0:
+                self.rate_2 = 0.4 * self.rate_1
         self.package_2 = self.package_last_year * (1 + self.rate_2)
 
     """第三步：水平调控"""
@@ -200,10 +200,10 @@ class Compete(Unit):
                  defer_last_year=np.nan, distributable_last_year=np.nan,
                  total_profit_last_year=np.nan, patmi_self_last_year=np.nan, patmi_BII_last_year=np.nan,
                  revenue_last_year=np.nan, cost_last_year=np.nan,
-                 invest_income_last_year=np.nan, other_income_last_year=np.nan,
+                 invest_income_last_year=np.nan, other_income_last_year=np.nan, labor_cost_last_year=np.nan,
                  total_profit=np.nan, patmi_self=np.nan, patmi_BII=np.nan,
                  revenue=np.nan, cost=np.nan,
-                 invest_income=np.nan, other_income=np.nan,
+                 invest_income=np.nan, other_income=np.nan, labor_cost=np.nan,
                  avg_employee_last_year=np.nan, avg_employee=np.nan,
                  key_score=np.nan,
                  eff_index_1_weight=np.nan, eff_index_2_weight=np.nan,
@@ -211,7 +211,8 @@ class Compete(Unit):
         super().__init__(var_name, name, package_last_year, defer_last_year, distributable_last_year,
                          total_profit_last_year, patmi_self_last_year, patmi_BII_last_year,
                          revenue_last_year, cost_last_year, invest_income_last_year, other_income_last_year,
-                         total_profit, patmi_self, patmi_BII, revenue, cost, invest_income, other_income,
+                         labor_cost_last_year,
+                         total_profit, patmi_self, patmi_BII, revenue, cost, invest_income, other_income, labor_cost,
                          avg_employee_last_year, avg_employee, key_score,
                          eff_index_1_weight, eff_index_2_weight, eff_index_3_weight, eff_index_4_weight)
 
@@ -251,9 +252,9 @@ class Public(Unit):
                  defer_last_year=np.nan, distributable_last_year=np.nan,
                  total_profit_last_year=np.nan, patmi_self_last_year=np.nan, patmi_BII_last_year=np.nan,
                  revenue_last_year=np.nan, cost_last_year=np.nan,
-                 invest_income_last_year=np.nan, other_income_last_year=np.nan,
+                 invest_income_last_year=np.nan, other_income_last_year=np.nan, labor_cost_last_year=np.nan,
                  total_profit=np.nan, patmi_self=np.nan, patmi_BII=np.nan,
-                 revenue=np.nan, cost=np.nan, invest_income=np.nan, other_income=np.nan,
+                 revenue=np.nan, cost=np.nan, invest_income=np.nan, other_income=np.nan, labor_cost=np.nan,
                  avg_employee_last_year=np.nan, avg_employee=np.nan, key_score=np.nan,
                  eff_index_1_weight=np.nan, eff_index_2_weight=np.nan,
                  eff_index_3_weight=np.nan, eff_index_4_weight=np.nan,
@@ -262,7 +263,8 @@ class Public(Unit):
         super().__init__(var_name, name, package_last_year, defer_last_year, distributable_last_year,
                          total_profit_last_year, patmi_self_last_year, patmi_BII_last_year,
                          revenue_last_year, cost_last_year, invest_income_last_year, other_income_last_year,
-                         total_profit, patmi_self, patmi_BII, revenue, cost, invest_income, other_income,
+                         labor_cost_last_year,
+                         total_profit, patmi_self, patmi_BII, revenue, cost, invest_income, other_income, labor_cost,
                          avg_employee_last_year, avg_employee, key_score,
                          eff_index_1_weight, eff_index_2_weight, eff_index_3_weight, eff_index_4_weight)
 
@@ -294,9 +296,9 @@ class Special(Unit):
                  defer_last_year=np.nan, distributable_last_year=np.nan,
                  total_profit_last_year=np.nan, patmi_self_last_year=np.nan, patmi_BII_last_year=np.nan,
                  revenue_last_year=np.nan, cost_last_year=np.nan,
-                 invest_income_last_year=np.nan, other_income_last_year=np.nan,
+                 invest_income_last_year=np.nan, other_income_last_year=np.nan, labor_cost_last_year=np.nan,
                  total_profit=np.nan, patmi_self=np.nan, patmi_BII=np.nan,
-                 revenue=np.nan, cost=np.nan, invest_income=np.nan, other_income=np.nan,
+                 revenue=np.nan, cost=np.nan, invest_income=np.nan, other_income=np.nan, labor_cost=np.nan,
                  avg_employee_last_year=np.nan, avg_employee=np.nan, key_score=np.nan,
                  eff_index_1_weight=np.nan, eff_index_2_weight=np.nan,
                  eff_index_3_weight=np.nan, eff_index_4_weight=np.nan,
@@ -304,7 +306,8 @@ class Special(Unit):
         super().__init__(var_name, name, package_last_year, defer_last_year, distributable_last_year,
                          total_profit_last_year, patmi_self_last_year, patmi_BII_last_year,
                          revenue_last_year, cost_last_year, invest_income_last_year, other_income_last_year,
-                         total_profit, patmi_self, patmi_BII, revenue, cost, invest_income, other_income,
+                         labor_cost_last_year,
+                         total_profit, patmi_self, patmi_BII, revenue, cost, invest_income, other_income, labor_cost,
                          avg_employee_last_year, avg_employee, key_score,
                          eff_index_1_weight, eff_index_2_weight, eff_index_3_weight, eff_index_4_weight)
 
@@ -330,9 +333,9 @@ class SpecialGov(Special):
                  defer_last_year=np.nan, distributable_last_year=np.nan,
                  total_profit_last_year=np.nan, patmi_self_last_year=np.nan, patmi_BII_last_year=np.nan,
                  revenue_last_year=np.nan, cost_last_year=np.nan,
-                 invest_income_last_year=np.nan, other_income_last_year=np.nan,
+                 invest_income_last_year=np.nan, other_income_last_year=np.nan, labor_cost_last_year=np.nan,
                  total_profit=np.nan, patmi_self=np.nan, patmi_BII=np.nan,
-                 revenue=np.nan, cost=np.nan, invest_income=np.nan, other_income=np.nan,
+                 revenue=np.nan, cost=np.nan, invest_income=np.nan, other_income=np.nan, labor_cost=np.nan,
                  avg_employee_last_year=np.nan, avg_employee=np.nan, key_score=np.nan,
                  eff_index_1_weight=np.nan, eff_index_2_weight=np.nan,
                  eff_index_3_weight=np.nan, eff_index_4_weight=np.nan,
@@ -340,7 +343,8 @@ class SpecialGov(Special):
         super().__init__(var_name, name, package_last_year, defer_last_year, distributable_last_year,
                          total_profit_last_year, patmi_self_last_year, patmi_BII_last_year,
                          revenue_last_year, cost_last_year, invest_income_last_year, other_income_last_year,
-                         total_profit, patmi_self, patmi_BII, revenue, cost, invest_income, other_income,
+                         labor_cost_last_year,
+                         total_profit, patmi_self, patmi_BII, revenue, cost, invest_income, other_income, labor_cost,
                          avg_employee_last_year, avg_employee, key_score,
                          eff_index_1_weight, eff_index_2_weight, eff_index_3_weight, eff_index_4_weight,
                          financial_index_name)
@@ -361,9 +365,9 @@ class SpecialMarket(Special):
                  defer_last_year=np.nan, distributable_last_year=np.nan,
                  total_profit_last_year=np.nan, patmi_self_last_year=np.nan, patmi_BII_last_year=np.nan,
                  revenue_last_year=np.nan, cost_last_year=np.nan,
-                 invest_income_last_year=np.nan, other_income_last_year=np.nan,
+                 invest_income_last_year=np.nan, other_income_last_year=np.nan, labor_cost_last_year=np.nan,
                  total_profit=np.nan, patmi_self=np.nan, patmi_BII=np.nan,
-                 revenue=np.nan, cost=np.nan, invest_income=np.nan, other_income=np.nan,
+                 revenue=np.nan, cost=np.nan, invest_income=np.nan, other_income=np.nan, labor_cost=np.nan,
                  avg_employee_last_year=np.nan, avg_employee=np.nan, key_score=np.nan,
                  eff_index_1_weight=np.nan, eff_index_2_weight=np.nan,
                  eff_index_3_weight=np.nan, eff_index_4_weight=np.nan,
@@ -371,7 +375,8 @@ class SpecialMarket(Special):
         super().__init__(var_name, name, package_last_year, defer_last_year, distributable_last_year,
                          total_profit_last_year, patmi_self_last_year, patmi_BII_last_year,
                          revenue_last_year, cost_last_year, invest_income_last_year, other_income_last_year,
-                         total_profit, patmi_self, patmi_BII, revenue, cost, invest_income, other_income,
+                         labor_cost_last_year,
+                         total_profit, patmi_self, patmi_BII, revenue, cost, invest_income, other_income, labor_cost,
                          avg_employee_last_year, avg_employee, key_score,
                          eff_index_1_weight, eff_index_2_weight, eff_index_3_weight, eff_index_4_weight,
                          financial_index_name)

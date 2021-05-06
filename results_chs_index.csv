@@ -38,6 +38,7 @@ revenue_last_year,上年度营收（万元）
 cost_last_year,上年度成本费用（万元）
 invest_income_last_year,上年度投资收益（万元）
 other_income_last_year,上年度其他收益（万元）
+labor_cost_last_year,上年度人工成本（万元）
 total_profit,本年度利润总额（万元）
 patmi_self,本年度归母净利润（万元）
 patmi_BII,本年度归母净利润-归属京投（万元）
@@ -45,6 +46,7 @@ revenue,本年度营收（万元）
 cost,本年度成本费用（万元）
 invest_income,本年度投资收益（万元）
 other_income,本年度其他收益（万元）
+labor_cost,本年度人工成本（万元）
 total_profit_growth,利润总额增幅
 patmi_self_growth,归母净利润增幅
 patmi_BII_growth,归母净利润-归属京投增幅
@@ -68,6 +70,13 @@ eff_index_2_growth,效率指标2增幅
 eff_index_3_growth,效率指标3增幅
 eff_index_4_growth,效率指标4增幅
 eff_growth,效率指标加权增幅
+labor_revenue_ratio_last_year,上年度人事费用率
+labor_revenue_ratio,本年度人事费用率
+labor_revenue_ratio_growth,人事费用率增幅（下降为正值）
+profit_labor_ratio_last_year,上年度人工成本利润率
+profit_labor_ratio,本年度人工成本利润率
+profit_labor_ratio_growth,人工成本利润率增幅
+labor_eff_growth,人工成本投入产出率加权增幅
 cost_income_ratio_last_year,上年度成本费用占营收比
 cost_income_ratio,本年度成本费用占营收比
 cost_income_ratio_growth,成本费用占营收比增幅（下降为正值）
