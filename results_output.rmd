@@ -15,11 +15,12 @@ library(tidyverse)
 library(kableExtra)
 library(scales)
 library(flextable)
+library(stringr)
 ```
 
 ```{r read_data, echo=FALSE}
-data <- read.csv("results.csv", encoding = "UTF-8")
-data.zhuangbei <- read.csv("results-zhuangbei.csv", encoding = "UTF-8") %>% filter(subcategory=="")
+data <- read.csv("results.csv", encoding = "UTF-8", stringsAsFactors = TRUE)
+data.zhuangbei <- read.csv("results-zhuangbei.csv", encoding = "UTF-8", stringsAsFactors = TRUE) %>% filter(subcategory=="")
 ```
 ## R Markdown
 
@@ -28,11 +29,28 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r compete_section_table, results='asis'}
+my.order <- c("京投发展", "京投科技", "基石租赁", "装备集团", "轨道咨询")
 df.1 <- data %>% filter(category=="Compete" & subcategory=="") %>%
     bind_rows(data.zhuangbei) %>% select(c(name, package_last_year, rate_real, package_real))
 df.1$rate_real <- percent(df.1$rate_real, accuracy = 0.01)
+df.1$name <- factor(df.1$name, levels = my.order)
+df.1 <- df.1 %>% arrange(name)
+colnames(df.1) <- c("公司名称",	"上年工资总额基数（万元）",	"本年工资总额增幅",	"本年工资总额预算（万元）")
 # knitr::kable(df.1, caption="竞争类板块测算情况", digits=2, align="r") %>% kable_styling("striped")
-regulartable(df.1)
+regulartable(df.1) %>% colformat_double(big.mark=",", digits = 0, na_str = "N/A") %>% width(width=1)
+```
+
+```{r special_section_table, results='asis'}
+my.order <- c("轨道公司", "路网公司", "资产公司", "管廊公司", "交通公司", "土地事业部", "多经事业部", "北信公司", "机关本部")
+df.2 <- data %>% filter(category=="Special" & subcategory=="Gov" | subcategory=="Market") %>% select(c(subcategory, name, package_last_year, rate_real, package_real))
+df.2$name <- factor(df.2$name, levels = my.order)
+df.2 <- df.2 %>% arrange(name)
+df.2$subcategory <- str_replace_all(df.2$subcategory, "Gov", "政府型")
+df.2$subcategory <- str_replace_all(df.2$subcategory, "Market", "经营型")
+df.2$rate_real <- percent(df.2$rate_real, accuracy = 0.01)
+colnames(df.2) <- c("类型",	"公司名称",	"上年工资总额基数（万元）",	"本年工资总额增幅",	"本年工资总额预算（万元）")
+# knitr::kable(df.1, caption="竞争类板块测算情况", digits=2, align="r") %>% kable_styling("striped")
+regulartable(df.2) %>% colformat_double(big.mark=",", digits = 0, na_str = "N/A") %>% width(width=1)
 ```
 
 ## Including Plots
