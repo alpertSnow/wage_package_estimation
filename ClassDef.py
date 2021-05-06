@@ -218,7 +218,7 @@ class Compete(Unit):
         self.category = "Compete"
 
     def rate_1_cal(self):
-        self.rate_1 = 0.5 * self.total_profit_growth + 0.3 * self.patmi_self_growth + 0.2 * self.revenue_growth
+        self.rate_1 = 0.5 * self.total_profit_growth + 0.3 * self.patmi_BII_growth + 0.2 * self.revenue_growth
 
     # 各家单位先扣减40%，然后自己套国资委的递延计算方法，得出工资总额+递延+扣减的总数（后面还需统一微调，即tune()）
     def rate_3_cal(self):
@@ -322,7 +322,7 @@ class Special(Unit):
     def rate_1_cal(self):
         # 计算成本费用占营收比
         self.key_score_converted_growth = GZW_score_converted_growth
-        self.rate_1 = 0.5 * GZW_score_converted_growth + 0.3 * self.patmi_self_growth + 0.2 * self.cost_income_ratio_growth
+        self.rate_1 = 0.5 * GZW_score_converted_growth + 0.3 * self.patmi_BII_growth + 0.2 * self.cost_income_ratio_growth
 
 
 class SpecialGov(Special):
