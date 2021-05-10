@@ -36,6 +36,10 @@ def do(thread, df1, df2, df3, df4):
     progress_bar = tqdm(total=SAMPLE_SIZE)
     for k in range(SAMPLE_SIZE):
         inputs = randomize_inputs(df1, df2, df3, df4)
+        # 将"减：京投大合并"的财务数据处理为: "京投大合并" * -1
+        if "dahebing_minus" in inputs["var_name"].values:
+            inputs.loc[inputs.var_name == "dahebing_minus", "revenue_last_year":"employee_cost"] = \
+                - inputs.loc[inputs.var_name == "dahebing", "revenue_last_year":"employee_cost"].values
         # 构造各单位实例
         for i, data in inputs.iterrows():
             class_name = data['category'] + data['subcategory']
@@ -139,10 +143,10 @@ def do(thread, df1, df2, df3, df4):
 """main"""
 if __name__ == '__main__':
     # 读取输入条件，四个表格分别为：平均值、标准差、下界、上界。非数值则只采用inputs_mean中的值
-    df_mean = pd.read_csv('inputs'+FILE_SUFFIX+'_mean.csv', converters={'subcategory': str}).astype("float", errors='ignore')
-    df_sd = pd.read_csv('inputs'+FILE_SUFFIX+'_sd.csv', converters={'subcategory': str}).astype("float", errors='ignore')
-    df_lower = pd.read_csv('inputs'+FILE_SUFFIX+'_lower.csv', converters={'subcategory': str}).astype("float", errors='ignore')
-    df_upper = pd.read_csv('inputs'+FILE_SUFFIX+'_upper.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+    df_mean = pd.read_csv('inputs' + FILE_SUFFIX + '_mean.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+    df_sd = pd.read_csv('inputs' + FILE_SUFFIX + '_sd.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+    df_lower = pd.read_csv('inputs' + FILE_SUFFIX + '_lower.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+    df_upper = pd.read_csv('inputs' + FILE_SUFFIX + '_upper.csv', converters={'subcategory': str}).astype("float", errors='ignore')
 
     """多线程运行"""
     partial_do = partial(do, df1=df_mean, df2=df_sd, df3=df_lower, df4=df_upper)
