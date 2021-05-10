@@ -173,7 +173,8 @@ def tune(section_units_df, approved_package, approved_defer):
         df.loc[j, "total_package_real"] = np.nansum([df.loc[j, "package_real"], df.loc[j, "defer_final"],
                                                      df.loc[j, "deduct_final"]])
         # 计算总包的微调系数
-        df.loc[j, "tune_total_package_coeff"] = df.loc[j, "total_package_final"] / df.loc[j, "total_package_3"]
+        df.loc[j, "tune_alpha"] = alpha
+        df.loc[j, "tune_beta"] = beta
 
         # 将多余的可统筹额度放在板块第一家
         if section_total_package_3 <= (approved_package + approved_defer + section_distributable_last_year):
@@ -296,7 +297,8 @@ def section_cal(section_obj, section_units_df):
     obj.rate_2 = obj.package_2 / obj.package_last_year - 1
     obj.rate_3 = obj.package_3 / obj.package_last_year - 1
     obj.avg_wage_last_year = (df.avg_wage_last_year * df.avg_employee).sum() / obj.avg_employee
-    obj.tune_total_package_coeff = obj.total_package_final / obj.total_package_3
+    obj.tune_alpha = df.tune_alpha[0]
+    obj.tune_beta = df.tune_beta[0]
     return 0
 
 

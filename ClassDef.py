@@ -50,7 +50,8 @@ class Unit(object):
         self.defer_rate_final = np.nan
         self.deduct_rate_3 = np.nan
         self.deduct_rate_final = np.nan
-        self.tune_total_package_coeff = np.nan  # 微调平账的调整系数:当年总包=实发+递延+扣减
+        self.tune_alpha = np.nan  # 微调平账的调整系数:总额不动，递延×alpha。详见 单位与板块矛盾统筹调整的逻辑.emmx
+        self.tune_beta = np.nan  # 微调平账的调整系数:总额和递延都×beta。详见 单位与板块矛盾统筹调整的逻辑.emmx
         self.total_profit_last_year = total_profit_last_year
         self.patmi_self_last_year = patmi_self_last_year  # 归母净利润Profit After Tax and Minority Interests
         self.patmi_BII_last_year = patmi_BII_last_year
