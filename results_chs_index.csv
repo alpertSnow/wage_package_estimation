@@ -30,7 +30,8 @@ avg_wage_final,本年度平均工资
 avg_wage_real,实际可发平均工资
 avg_employee_last_year,上年度平均人数
 avg_employee,本年度平均人数
-tune_total_package_coeff,板块微调系数
+tune_alpha,板块微调系数（递延）
+tune_beta,板块微调系数（总包）
 total_profit_last_year,上年度利润总额（万元）
 patmi_self_last_year,上年度归母净利润（万元）
 patmi_BII_last_year,上年度归母净利润-归属京投（万元）
