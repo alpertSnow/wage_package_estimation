@@ -20,6 +20,7 @@ from FnDef import section_concat  # 将板块对象section合并入对应板块�
 from FnDef import rate_final_cal  # 最后收尾计算
 from ConstVar import SAMPLE_SIZE  # 随机采样个数
 from ConstVar import THREAD_NO  # 线程数
+from ConstVar import FILE_SUFFIX  #
 
 pd.options.mode.chained_assignment = None  # default='warn'
 warnings.filterwarnings('ignore', category=RuntimeWarning)
@@ -138,10 +139,10 @@ def do(thread, df1, df2, df3, df4):
 """main"""
 if __name__ == '__main__':
     # 读取输入条件，四个表格分别为：平均值、标准差、下界、上界。非数值则只采用inputs_mean中的值
-    df_mean = pd.read_csv('inputs_mean.csv', converters={'subcategory': str}).astype("float", errors='ignore')
-    df_sd = pd.read_csv('inputs_sd.csv', converters={'subcategory': str}).astype("float", errors='ignore')
-    df_lower = pd.read_csv('inputs_lower.csv', converters={'subcategory': str}).astype("float", errors='ignore')
-    df_upper = pd.read_csv('inputs_upper.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+    df_mean = pd.read_csv('inputs'+FILE_SUFFIX+'_mean.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+    df_sd = pd.read_csv('inputs'+FILE_SUFFIX+'_sd.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+    df_lower = pd.read_csv('inputs'+FILE_SUFFIX+'_lower.csv', converters={'subcategory': str}).astype("float", errors='ignore')
+    df_upper = pd.read_csv('inputs'+FILE_SUFFIX+'_upper.csv', converters={'subcategory': str}).astype("float", errors='ignore')
 
     """多线程运行"""
     partial_do = partial(do, df1=df_mean, df2=df_sd, df3=df_lower, df4=df_upper)
@@ -149,7 +150,7 @@ if __name__ == '__main__':
     all_results_df = pd.concat(pool.map(partial_do, range(THREAD_NO)))  # process data_inputs iterable with pool
     """输出csv"""
     print("\n采样完成，开始输出！")
-    all_results_df.to_csv("results-MC.csv", encoding="UTF-8", float_format='%.5f', index=False)
+    all_results_df.to_csv("results" + FILE_SUFFIX + "-MC.csv", encoding="UTF-8", float_format='%.5f', index=False)
     # all_results_df.to_excel("results.xlsx", sheet_name="all", encoding="UTF-8", engine='xlsxwriter', float_format='%.5f'
     # , index=False)
     print("输出完成，程序结束！")

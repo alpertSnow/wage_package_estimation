@@ -14,6 +14,7 @@ from FnDef import create_section_obj  # 创建板块合计对象
 from FnDef import section_cal  # 各单位rate_1~3计算完成后，创建section板块对象后计算版块数据
 from FnDef import section_concat  # 将板块对象section合并入对应板块列表
 from FnDef import rate_final_cal  # 最后收尾计算
+from ConstVar import FILE_SUFFIX
 pd.options.mode.chained_assignment = None  # default='warn'
 warnings.filterwarnings('ignore', category=RuntimeWarning)
 
@@ -21,7 +22,7 @@ warnings.filterwarnings('ignore', category=RuntimeWarning)
 
 """main"""
 if __name__ == '__main__':
-    inputs = pd.read_csv('inputs.csv', converters={'subcategory': str})
+    inputs = pd.read_csv('inputs' + FILE_SUFFIX + '.csv', converters={'subcategory': str})
     # 构造各单位实例
     for i, data in inputs.iterrows():
         class_name = data['category'] + data['subcategory']
@@ -121,9 +122,9 @@ if __name__ == '__main__':
     print("采样完成，开始输出！")
     results_chs_index = pd.read_csv("results_chs_index.csv")
     results_chs_index_dict = results_chs_index.set_index("var_name").to_dict()["变量名称"]
-    results_df.to_csv("results.csv", encoding="UTF-8", float_format='%.5f', index=False)
+    results_df.to_csv("results" + FILE_SUFFIX + ".csv", encoding="UTF-8", float_format='%.5f', index=False)
 
     results_df = results_df.rename(columns=results_chs_index_dict)
-    results_df.to_excel("results.xlsx", sheet_name="all", encoding="UTF-8", engine='xlsxwriter',
+    results_df.to_excel("results" + FILE_SUFFIX + ".xlsx", sheet_name="all", encoding="UTF-8", engine='xlsxwriter',
                         float_format='%.5f', index=False)
     print("输出完成，程序结束！")
